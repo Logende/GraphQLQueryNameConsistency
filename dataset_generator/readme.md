@@ -16,4 +16,8 @@ As for the project we stick to 1000 repositories for dataset generation, the rep
 Additionally, the scraper was modified to collect the repositories of the `@apollo-client` and `apollo-client` only and ignore the other packages (`apollo-boost`, `apollo-cache`, ...).
 We make use of the `min_stars` parameter of the script and collect repositories with at least 3 stars only.
 
-The resulting CSV of identified repositories is stored in `my_csv_dir/dependents_apollo-client.csv`.
+The resulting CSV of identified repositories is stored in `collected_dependents/dependents_apollo-client.csv`.
+
+## Clone repositories
+
+Todo: script that goes over repos and clones them.

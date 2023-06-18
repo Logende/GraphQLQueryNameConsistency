@@ -40,7 +40,7 @@ class GithubDependentsInfo:
         self.result = {}
 
     def collect(self):
-        # max count of repos we want to find
+        # max count of collected_repos we want to find
         max_repo_count = 1000
         logging.error("start")
 
@@ -171,7 +171,7 @@ class GithubDependentsInfo:
         # make all_dependent_repos unique
         self.all_public_dependent_repos = list({v["name"]: v for v in self.all_public_dependent_repos}.values())
 
-        # Sort packages and dependent repos
+        # Sort packages and dependent collected_repos
         if self.sort_key == "stars":
             self.packages = sorted(self.packages, key=lambda d: d["public_dependent_stars"], reverse=True)
             self.all_public_dependent_repos = sorted(
@@ -455,7 +455,7 @@ if __name__ == '__main__':
         sort_key="stars",
         min_stars=3,
         json_output=True,
-        csv_directory="my_csv_dir",
+        csv_directory="collected_dependents",
         badge_markdown_file=None,
         badge_color="informational",
         merge_packages=False,
