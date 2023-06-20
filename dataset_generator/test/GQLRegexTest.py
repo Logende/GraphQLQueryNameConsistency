@@ -1,7 +1,7 @@
 import unittest
 from pathlib import Path
 import os
-from GraphQLQueryNameConsistency.dataset_generator.dataset_generator.extractQueryNamePairs import extract_gql_sections_from_file
+from GraphQLQueryNameConsistency.dataset_generator.dataset_generator.extract_gql_queries import extract_gql_sections_from_file
 
 
 class MyTestCase(unittest.TestCase):
