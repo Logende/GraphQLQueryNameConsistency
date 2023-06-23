@@ -81,6 +81,9 @@ if __name__ == '__main__':
     repositories_path = root_path.joinpath("collected_repos")
     queries_path = root_path.joinpath("collected_queries")
 
+    if not queries_path.exists():
+        queries_path.mkdir()
+
     for path in Path(repositories_path).glob("*/"):
         if path.is_dir():
             print("Found repo dir " + str(path))
@@ -88,5 +91,4 @@ if __name__ == '__main__':
             repository_path = path
             result = extract_queries_from_repo(repository_path)
             repo_name = str(repository_path.name)
-            print("Collected " + str(len(result)) + " GQL operations/fragments from " + repo_name + ".")
             persist_extracted_data(queries_path.joinpath(repo_name + ".yaml"), result)
