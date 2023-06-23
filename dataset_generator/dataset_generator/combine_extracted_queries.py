@@ -12,7 +12,7 @@ def load_extracted_data(file_path: Path) -> List[Operation | Fragment]:
     result_list = []
     with open(file_path, 'r') as reader:
         try:
-            data = yaml.load(reader)
+            data = yaml.safe_load(reader)
         except UnicodeDecodeError:
             print("Unable to decode " + str(file_path))
             return []
