@@ -1,12 +1,10 @@
-import re
 import os
 from pathlib import Path
-from typing import List, Tuple
+from typing import List
 
 import json
 
 from gql_model import Fragment, Operation
-from extract_gql_queries import persist_extracted_data
 
 
 def load_extracted_data(file_path: Path) -> List[Operation | Fragment]:
@@ -23,6 +21,14 @@ def load_extracted_data(file_path: Path) -> List[Operation | Fragment]:
     return result_list
 
 
+def persist_dataset(file_path: Path, data: List[Operation | Fragment]):
+    operations = [operation.to_dict() for operation in data
+                  if isinstance(operation, Operation) and operation.operation_name is not None]
+    # Currently, we only care about operations for dataset
+    with open(file_path, 'w') as writer:
+        json.dump(operations, writer)
+
+
 if __name__ == '__main__':
     dir_name = os.path.dirname(os.path.realpath(__file__))
     root_path = Path(dir_name).parent
@@ -35,4 +41,4 @@ if __name__ == '__main__':
             subset_data = load_extracted_data(path)
             all_data.extend(subset_data)
 
-    persist_extracted_data(root_path.joinpath("dataset.json"), all_data)
+    persist_dataset(root_path.joinpath("dataset.json"), all_data)
