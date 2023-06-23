@@ -82,7 +82,10 @@ if __name__ == '__main__':
     queries_path = root_path.joinpath("collected_queries")
 
     if not queries_path.exists():
+        print("Folder " + str(queries_path) + " does not exist yet. Creating it.")
         queries_path.mkdir()
+    else:
+        print("Folder " + str(queries_path) + " already exists.")
 
     for path in Path(repositories_path).glob("*/"):
         if path.is_dir():
