@@ -39,10 +39,15 @@ def strip_gql_boilerplate(gql_section: str) -> str:
     return gql_section.removeprefix("gql`").removesuffix("`").strip()
 
 
-def extract_type_name_content_tuple(gql_section) -> Fragment | Operation:
+def extract_type_name_content_tuple(gql_section: str) -> Fragment | Operation | None:
     content = strip_gql_boilerplate(gql_section)
 
-    operation_type = re.match(r"^\w+", content).group()
+    re_result = re.match(r"^\w+", content)
+    if re_result is None:
+        print("Unable to extract operation type from GQL section '" + gql_section + "'.")
+        return None
+
+    operation_type = re_result.group()
     content = content.removeprefix(operation_type).strip()
 
     if operation_type == "fragment":
@@ -61,7 +66,8 @@ def extract_queries_from_repo(repo_path: Path) -> List[Operation | Fragment]:
     gql_sections = extract_gql_sections_from_repo(repo_path)
     print("Found " + (str(len(gql_sections))) + " gql strings in the repository.")
 
-    return [extract_type_name_content_tuple(section) for section in gql_sections]
+    result_list = [extract_type_name_content_tuple(section) for section in gql_sections]
+    return [v for v in result_list if v is not None]
 
 
 def persist_extracted_data(file_path: Path, data: List[Operation | Fragment]):
