@@ -80,7 +80,7 @@ if __name__ == '__main__':
     root_path = Path(dir_name).parent
     repositories_path = root_path.joinpath("collected_repos")
 
-    for file_path in Path(repositories_path).glob("/"):
+    for file_path in Path(repositories_path).glob("*/"):
         if file_path.is_dir():
             print("Found repo dir " + str(file_path))
 
