@@ -14,6 +14,6 @@ if __name__ == '__main__':
         reader = csv.DictReader(csvfile)
         for row in reader:
             repo_name: str = row['name']
-            repo_name = repo_name.replace("/", "_")
+            result_folder = result_repositories_path.joinpath(repo_name.replace("/", "_"))
             print("Start cloning Repo " + repo_name + ".")
-            repo = Repo.clone_from("https://github.com/" + repo_name, result_repositories_path.joinpath(repo_name))
+            repo = Repo.clone_from("https://github.com/" + repo_name, result_folder)
