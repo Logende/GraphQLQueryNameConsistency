@@ -13,7 +13,7 @@ def load_extracted_data(file_path: Path) -> List[Operation | Fragment]:
         try:
             data = json.load(reader)
         except UnicodeDecodeError:
-            print("Unable to decode " + reader.read())
+            print("Unable to decode " + file_path)
             return []
 
         fragments = data["fragments"]
