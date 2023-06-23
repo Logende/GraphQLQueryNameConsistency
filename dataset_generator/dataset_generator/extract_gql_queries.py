@@ -78,7 +78,7 @@ def persist_extracted_data(file_path: Path, data: List[Operation | Fragment]):
         "operations": operations
     }
     with open(file_path, 'w') as writer:
-        json.safe_dump(new_data, writer)
+        json.dump(new_data, writer)
 
 
 if __name__ == '__main__':
