@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 from typing import List, Tuple
 
-import yaml
+import json
 
 from gql_model import Fragment, Operation
 
@@ -78,7 +78,7 @@ def persist_extracted_data(file_path: Path, data: List[Operation | Fragment]):
         "operations": operations
     }
     with open(file_path, 'w') as writer:
-        yaml.safe_dump(new_data, writer)
+        json.safe_dump(new_data, writer)
 
 
 if __name__ == '__main__':
@@ -100,4 +100,4 @@ if __name__ == '__main__':
             repository_path = path
             result = extract_queries_from_repo(repository_path)
             repo_name = str(repository_path.name)
-            persist_extracted_data(queries_path.joinpath(repo_name + ".yaml"), result)
+            persist_extracted_data(queries_path.joinpath(repo_name + ".json"), result)
