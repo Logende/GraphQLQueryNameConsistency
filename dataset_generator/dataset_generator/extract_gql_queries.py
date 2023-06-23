@@ -76,12 +76,15 @@ def persist_extracted_data(file_path: Path, data: List[Operation | Fragment]):
 
 
 if __name__ == '__main__':
-    repository_name = "spectrum"
-
     dir_name = os.path.dirname(os.path.realpath(__file__))
     root_path = Path(dir_name).parent
+    repositories_path = root_path.joinpath("collected_repos")
 
-    repository_path = root_path.joinpath("collected_repos").joinpath(repository_name)
-    result = extract_queries_from_repo(repository_path)
+    for file_path in Path(repositories_path).glob("/"):
+        if file_path.is_dir():
+            print("Found repo dir " + str(file_path))
 
-    persist_extracted_data(root_path.joinpath("collected_queries").joinpath(repository_name + ".yaml"), result)
+    #repository_path = root_path.joinpath("collected_repos").joinpath(repository_name)
+    #result = extract_queries_from_repo(repository_path)
+
+    #persist_extracted_data(root_path.joinpath("collected_queries").joinpath(repository_name + ".yaml"), result)
