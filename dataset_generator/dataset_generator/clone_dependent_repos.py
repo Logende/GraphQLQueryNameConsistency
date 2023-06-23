@@ -16,7 +16,7 @@ if __name__ == '__main__':
             repo_name: str = row['name']
             result_folder = result_repositories_path.joinpath(repo_name.replace("/", "_"))
             if result_folder.exists():
-                print("Folder " + result_folder + " already exists. Not cloning again.")
+                print("Folder " + str(result_folder) + " already exists. Not cloning again.")
             else:
                 print("Start cloning Repo " + repo_name + ".")
                 repo = Repo.clone_from("https://github.com/" + repo_name, result_folder)
