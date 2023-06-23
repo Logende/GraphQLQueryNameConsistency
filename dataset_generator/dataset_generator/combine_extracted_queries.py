@@ -10,7 +10,12 @@ from gql_model import Fragment, Operation
 def load_extracted_data(file_path: Path) -> List[Operation | Fragment]:
     result_list = []
     with open(file_path, 'r') as reader:
-        data = json.load(reader)
+        try:
+            data = json.load(reader)
+        except UnicodeDecodeError:
+            print("Unable to decode " + reader.read())
+            return []
+
         fragments = data["fragments"]
         operations = data["operations"]
         for fragment_data in fragments:
