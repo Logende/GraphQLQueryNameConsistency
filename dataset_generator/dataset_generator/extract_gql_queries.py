@@ -31,7 +31,7 @@ def extract_gql_sections_from_file(file_path: Path) -> List[str]:
 def extract_gql_sections_from_repo(repo_path: Path) -> List[str]:
     all_results = []
 
-    patterns = ('*.ts')
+    patterns = ('*.ts', '*.js')
     all_relevant_files = []
     for pattern in patterns:
         all_relevant_files.extend(Path(repo_path).rglob(pattern))
