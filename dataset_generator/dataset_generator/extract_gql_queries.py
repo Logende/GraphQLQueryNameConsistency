@@ -8,6 +8,9 @@ import yaml
 from gql_model import Fragment, Operation
 
 
+relevant_file_patterns = ("*.js", "*.ts", "*.jsx")
+
+
 def extract_constants_from_text(data: str) -> Dict:
     all_results = {}
     # Seems like query string literals have a gql prefix: gql`query_content'
@@ -32,9 +35,8 @@ def extract_constants_from_file(file_path: Path) -> Dict:
 def extract_constants_from_repo(repo_path: Path) -> {}:
     all_results = {}
 
-    patterns = ('*.ts', '*.js')
     all_relevant_files = []
-    for pattern in patterns:
+    for pattern in relevant_file_patterns:
         all_relevant_files.extend(Path(repo_path).rglob(pattern))
 
     for file_path in all_relevant_files:
@@ -72,9 +74,8 @@ def extract_gql_sections_from_file(file_path: Path) -> List[str]:
 def extract_gql_sections_from_repo(repo_path: Path) -> List[str]:
     all_results = []
 
-    patterns = ('*.ts', '*.js')
     all_relevant_files = []
-    for pattern in patterns:
+    for pattern in relevant_file_patterns:
         all_relevant_files.extend(Path(repo_path).rglob(pattern))
 
     for file_path in all_relevant_files:
