@@ -43,7 +43,10 @@ It will be attempted to extract GQL operations from those files.
 
 This is done by looking for the regex pattern gql\`<operation>\`.
 
-It will be checked whether `<operation>` actually is an operation or whether it is a fragment.
+It will be checked whether `<operation>` actually is an operation or whether it is a fragment or something else.
+If neither operation nor fragment can be extracted in a trivial way, it will be checked whether the `<operation>` value is a placeholder expression of the form `${<variable_name>}'.
+Should this be the case, the extraction algorithm will be applied on the value behind this placeholder.
+This can be done by previously extracting all constant variables from all Javascript and Typescript files using regular expressions.
 
 If it is an operation, it will be attempted to extract the operation type (`query`, `mutation` or `subscription`).
 Next, it will be checked whether there exists a custom operation name (e.g. query name). This will be extracted too.
