@@ -21,7 +21,10 @@ def extract_gql_sections_from_text(data: str) -> List[str]:
 
 def extract_gql_sections_from_file(file_path: Path) -> List[str]:
     with open(file_path, 'r') as reader:
-        return extract_gql_sections_from_text(reader.read())
+        try:
+            return extract_gql_sections_from_text(reader.read())
+        except UnicodeDecodeError:
+            print("Unable to decode file " + file_path)
 
 
 def extract_gql_sections_from_repo(repo_path: Path) -> List[str]:
