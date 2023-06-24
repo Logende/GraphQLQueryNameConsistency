@@ -8,7 +8,7 @@ import yaml
 from gql_model import Fragment, Operation
 
 
-relevant_file_patterns = ("*.js", "*.ts", "*.jsx")
+relevant_file_patterns = ("*.js", "*.ts", "*.jsx", "*.tsx")
 
 
 def extract_constants_from_text(data: str) -> Dict:
