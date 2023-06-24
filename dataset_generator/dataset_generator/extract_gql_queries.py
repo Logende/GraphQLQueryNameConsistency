@@ -8,17 +8,6 @@ import yaml
 from gql_model import Fragment, Operation
 
 
-def extract_gql_sections_from_text(data: str) -> List[str]:
-    all_results = []
-    # Seems like query string literals have a gql prefix: gql`query_content'
-    regex = r"gql`(\s|((?!`).)*)+`"
-    matches = re.finditer(regex, data, re.MULTILINE)
-    if matches:
-        for _, match in enumerate(matches, start=1):
-            all_results.append(match.group())
-    return all_results
-
-
 def extract_constants_from_text(data: str) -> Dict:
     all_results = {}
     # Seems like query string literals have a gql prefix: gql`query_content'
@@ -53,7 +42,20 @@ def extract_constants_from_repo(repo_path: Path) -> {}:
             continue
         else:
             sub_results = extract_constants_from_file(file_path)
+            # note that if the same variable name is exported multiple times, it will be overwritten and the
+            # dict will contain just one instance of it
             all_results = {**all_results, **sub_results}
+    return all_results
+
+
+def extract_gql_sections_from_text(data: str) -> List[str]:
+    all_results = []
+    # Seems like query string literals have a gql prefix: gql`query_content'
+    regex = r"gql`(\s|((?!`).)*)+`"
+    matches = re.finditer(regex, data, re.MULTILINE)
+    if matches:
+        for _, match in enumerate(matches, start=1):
+            all_results.append(match.group())
     return all_results
 
 
