@@ -24,7 +24,7 @@ def extract_gql_sections_from_file(file_path: Path) -> List[str]:
         try:
             return extract_gql_sections_from_text(reader.read())
         except UnicodeDecodeError:
-            print("Unable to decode file " + file_path)
+            print("Unable to decode file " + str(file_path))
 
 
 def extract_gql_sections_from_repo(repo_path: Path) -> List[str]:
