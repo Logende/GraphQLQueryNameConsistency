@@ -1,7 +1,7 @@
 import re
 import os
 from pathlib import Path
-from typing import List
+from typing import List, Dict
 
 import yaml
 
@@ -19,10 +19,49 @@ def extract_gql_sections_from_text(data: str) -> List[str]:
     return all_results
 
 
+def extract_constants_from_text(data: str) -> Dict:
+    all_results = {}
+    # Seems like query string literals have a gql prefix: gql`query_content'
+    regex = r"export\s+const\s+(\w+)\s*\=\s*`((\s|((?!`).)*)+)`"
+    matches = re.finditer(regex, data, re.MULTILINE)
+    if matches:
+        for _, match in enumerate(matches, start=1):
+            all_results[match.group(1)] = match.group(2)
+    return all_results
+
+
+def extract_constants_from_file(file_path: Path) -> Dict:
+    with open(file_path, 'r') as reader:
+        try:
+            data = reader.read()
+            return extract_constants_from_text(data)
+        except UnicodeDecodeError:
+            print("Unable to decode file " + str(file_path))
+            return {}
+
+
+def extract_constants_from_repo(repo_path: Path) -> {}:
+    all_results = {}
+
+    patterns = ('*.ts', '*.js')
+    all_relevant_files = []
+    for pattern in patterns:
+        all_relevant_files.extend(Path(repo_path).rglob(pattern))
+
+    for file_path in all_relevant_files:
+        if not file_path.is_file() or file_path.is_dir():
+            continue
+        else:
+            sub_results = extract_constants_from_file(file_path)
+            all_results = {**all_results, **sub_results}
+    return all_results
+
+
 def extract_gql_sections_from_file(file_path: Path) -> List[str]:
     with open(file_path, 'r') as reader:
         try:
-            return extract_gql_sections_from_text(reader.read())
+            data = reader.read()
+            return extract_gql_sections_from_text(data)
         except UnicodeDecodeError:
             print("Unable to decode file " + str(file_path))
             return []
@@ -49,11 +88,18 @@ def strip_gql_boilerplate(gql_section: str) -> str:
     return gql_section.removeprefix("gql`").removesuffix("`").strip()
 
 
-def extract_type_name_content_tuple(gql_section: str) -> Fragment | Operation | None:
+def extract_operation_or_fragment(gql_section: str, constants: Dict) -> Fragment | Operation | None:
     content = strip_gql_boilerplate(gql_section)
 
     re_result = re.match(r"^\w+", content)
     if re_result is None:
+        # If first thing in string is not word: no operation name.
+        # But one rescue attempt possible: by replacing constants
+        re_result = re.match(r"\$\{(\w+)\}", content)
+        if re_result is not None:
+            variable_name = re_result.group(1)
+            if variable_name in constants:
+                return extract_operation_or_fragment(constants[variable_name], constants)
         print("Unable to extract operation type from GQL section '" + gql_section + "'.")
         return None
 
@@ -76,7 +122,10 @@ def extract_queries_from_repo(repo_path: Path) -> List[Operation | Fragment]:
     gql_sections = extract_gql_sections_from_repo(repo_path)
     print("Found " + (str(len(gql_sections))) + " gql strings in the repository.")
 
-    result_list = [extract_type_name_content_tuple(section) for section in gql_sections]
+    constants = extract_constants_from_repo(repo_path)
+    print("Found " + (str(len(constants))) + " constants in the repository.")
+
+    result_list = [extract_operation_or_fragment(section, constants) for section in gql_sections]
     return [v for v in result_list if v is not None]
 
 
