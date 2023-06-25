@@ -123,10 +123,10 @@ def extract_queries_from_repo(repo_path: Path) -> List[Operation | Fragment]:
     print("Extracting query-name-pairs from repository " + str(repo_path) +
           " having " + str(len(all_relevant_files)) + " candidate files.")
 
-    gql_sections = extract_gql_sections(repo_path, all_relevant_files)
+    gql_sections = extract_gql_sections(all_relevant_files)
     print("Found " + (str(len(gql_sections))) + " gql strings in the repository.")
 
-    constants = extract_constants(repo_path, all_relevant_files)
+    constants = extract_constants(all_relevant_files)
     print("Found " + (str(len(constants))) + " constants in the repository.")
 
     result_list = [extract_operation_or_fragment(section, constants) for section in gql_sections]
