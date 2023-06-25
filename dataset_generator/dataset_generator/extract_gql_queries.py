@@ -32,12 +32,8 @@ def extract_constants_from_file(file_path: Path) -> Dict:
             return {}
 
 
-def extract_constants_from_repo(repo_path: Path) -> {}:
+def extract_constants(all_relevant_files: List[Path]) -> {}:
     all_results = {}
-
-    all_relevant_files = []
-    for pattern in relevant_file_patterns:
-        all_relevant_files.extend(Path(repo_path).rglob(pattern))
 
     for file_path in all_relevant_files:
         if not file_path.is_file() or file_path.is_dir():
@@ -71,12 +67,8 @@ def extract_gql_sections_from_file(file_path: Path) -> List[str]:
             return []
 
 
-def extract_gql_sections_from_repo(repo_path: Path) -> List[str]:
+def extract_gql_sections(all_relevant_files: List[Path]) -> List[str]:
     all_results = []
-
-    all_relevant_files = []
-    for pattern in relevant_file_patterns:
-        all_relevant_files.extend(Path(repo_path).rglob(pattern))
 
     for file_path in all_relevant_files:
         if not file_path.is_file() or file_path.is_dir():
@@ -85,6 +77,13 @@ def extract_gql_sections_from_repo(repo_path: Path) -> List[str]:
             sub_results = extract_gql_sections_from_file(file_path)
             all_results.extend(sub_results)
     return all_results
+
+
+def glob_relevant_files(repo_path: Path) -> List[Path]:
+    all_relevant_files = []
+    for pattern in relevant_file_patterns:
+        all_relevant_files.extend(Path(repo_path).rglob(pattern))
+    return all_relevant_files
 
 
 def strip_gql_boilerplate(gql_section: str) -> str:
@@ -120,12 +119,14 @@ def extract_operation_or_fragment(gql_section: str, constants: Dict) -> Fragment
 
 
 def extract_queries_from_repo(repo_path: Path) -> List[Operation | Fragment]:
-    print("Extracting query-name-pairs from repository " + str(repo_path) + ".")
+    all_relevant_files = glob_relevant_files(repo_path)
+    print("Extracting query-name-pairs from repository " + str(repo_path) +
+          " having " + str(len(all_relevant_files)) + " candidate files.")
 
-    gql_sections = extract_gql_sections_from_repo(repo_path)
+    gql_sections = extract_gql_sections(repo_path, all_relevant_files)
     print("Found " + (str(len(gql_sections))) + " gql strings in the repository.")
 
-    constants = extract_constants_from_repo(repo_path)
+    constants = extract_constants(repo_path, all_relevant_files)
     print("Found " + (str(len(constants))) + " constants in the repository.")
 
     result_list = [extract_operation_or_fragment(section, constants) for section in gql_sections]
