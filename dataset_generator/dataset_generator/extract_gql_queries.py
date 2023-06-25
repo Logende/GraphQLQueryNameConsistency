@@ -53,7 +53,6 @@ def extract_gql_sections_from_text(data: str) -> List[str]:
     matches = re.finditer(regex, data, re.MULTILINE)
     if matches:
         for _, match in enumerate(matches, start=1):
-            print("found regex match " + str(match.group()))
             all_results.append(match.group())
     return all_results
 
@@ -63,7 +62,6 @@ def extract_gql_sections_from_file(file_path: Path) -> List[str]:
         try:
             data = reader.read()
             matches = extract_gql_sections_from_text(data)
-            print("found " + str(len(matches)) + " matches in " + str(file_path))
             return matches
         except UnicodeDecodeError:
             print("Unable to decode file " + str(file_path))
