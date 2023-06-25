@@ -22,7 +22,7 @@ if __name__ == '__main__':
                 for row in reader:
                     repo_name: str = row['name']
                     result_folder = result_repositories_path.joinpath(repo_name.replace("/", "_"))
-                    progress_file = result_repositories_path.joinpath(repo_name + ".progress")
+                    progress_file = result_repositories_path.joinpath(repo_name.replace("/", "_") + ".progress")
                     if result_folder.exists():
                         print("Folder " + str(result_folder) + " already exists. Not cloning again.")
                     elif progress_file.exists():
