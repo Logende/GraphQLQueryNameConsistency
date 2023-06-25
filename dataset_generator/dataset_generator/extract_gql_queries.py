@@ -52,6 +52,7 @@ def extract_gql_sections_from_text(data: str) -> List[str]:
     regex = r"gql`(\s|((?!`).)*)+`"
     matches = re.finditer(regex, data, re.MULTILINE)
     if matches:
+        print("found regex match")
         for _, match in enumerate(matches, start=1):
             all_results.append(match.group())
     return all_results
