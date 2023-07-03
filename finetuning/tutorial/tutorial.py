@@ -42,7 +42,31 @@ def set_seed(seed):
         torch.cuda.manual_seed_all(seed)
 
 
-set_seed(42)
+
+
+class LoggingCallback(pl.Callback):
+    def on_validation_end(self, trainer, pl_module):
+        logger.info("***** Validation results *****")
+        if pl_module.is_logger():
+            metrics = trainer.callback_metrics
+            # Log results
+            for key in sorted(metrics):
+                if key not in ["log", "progress_bar"]:
+                    logger.info("{} = {}\n".format(key, str(metrics[key])))
+
+    def on_test_end(self, trainer, pl_module):
+        logger.info("***** Test results *****")
+
+        if pl_module.is_logger():
+            metrics = trainer.callback_metrics
+
+            # Log and save results to file
+            output_test_results_file = os.path.join(pl_module.hparams.output_dir, "test_results.txt")
+            with open(output_test_results_file, "w") as writer:
+                for key in sorted(metrics):
+                    if key not in ["log", "progress_bar"]:
+                        logger.info("{} = {}\n".format(key, str(metrics[key])))
+                        writer.write("{} = {}\n".format(key, str(metrics[key])))
 
 
 class T5FineTuner(pl.LightningModule):
@@ -124,7 +148,8 @@ class T5FineTuner(pl.LightningModule):
         self.opt = optimizer
         return [optimizer]
 
-    def optimizer_step(self, epoch: int, batch_idx: int, optimizer: Union[Optimizer, LightningOptimizer], optimizer_closure: Optional[Callable[[], Any]]):
+    def optimizer_step(self, epoch: int, batch_idx: int, optimizer: Union[Optimizer, LightningOptimizer],
+                       optimizer_closure: Optional[Callable[[], Any]]):
         # if self.trainer.use_tpu:
         #    xm.optimizer_step(optimizer)
         # else:
@@ -205,11 +230,6 @@ args_dict = dict(
     seed=42,
 )
 
-tokenizer = T5Tokenizer.from_pretrained('t5-base')
-
-ids_neg = tokenizer.encode('negative </s>')
-ids_pos = tokenizer.encode('positive </s>')
-len(ids_neg), len(ids_pos)
 
 
 class ImdbDataset(Dataset):
@@ -271,12 +291,18 @@ class ImdbDataset(Dataset):
             self.targets.append(tokenized_targets)
 
 
-dataset = ImdbDataset(tokenizer, 'aclImdb', 'val', max_len=512)
-len(dataset)
+#set_seed(42)
+#tokenizer = T5Tokenizer.from_pretrained('t5-base')
 
-data = dataset[28]
-print(tokenizer.decode(data['source_ids']))
-print(tokenizer.decode(data['target_ids']))
+#ids_neg = tokenizer.encode('negative </s>')
+#ids_pos = tokenizer.encode('positive </s>')
+#len(ids_neg), len(ids_pos)
+#dataset = ImdbDataset(tokenizer, 'aclImdb', 'val', max_len=512)
+#len(dataset)
+
+#data = dataset[28]
+#print(tokenizer.decode(data['source_ids']))
+#print(tokenizer.decode(data['target_ids']))
 
 args_dict.update({'data_dir': 'aclImdb', 'output_dir': 't5_imdb_sentiment', 'num_train_epochs': 2})
 args = argparse.Namespace(**args_dict)
@@ -294,7 +320,7 @@ train_params = dict(
     precision=16 if args.fp_16 else 32,
     # amp_level=args.opt_level,
     gradient_clip_val=args.max_grad_norm,
-    checkpoint_callback=checkpoint_callback,
+    # checkpoint_callback=checkpoint_callback,
     callbacks=[LoggingCallback(), checkpoint_callback],
 )
 
