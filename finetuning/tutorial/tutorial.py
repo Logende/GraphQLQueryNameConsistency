@@ -9,8 +9,11 @@ import shutil
 import re
 from itertools import chain
 from string import punctuation
+from typing import Union, Optional, Callable, Any
 
 import nltk
+from pytorch_lightning.core.optimizer import LightningOptimizer
+from torch.optim import Optimizer
 
 nltk.download('punkt')
 from nltk.tokenize import sent_tokenize
@@ -28,6 +31,8 @@ from transformers import (
     get_linear_schedule_with_warmup
 )
 
+logger = logging.getLogger(__name__)
+
 
 def set_seed(seed):
     random.seed(seed)
@@ -43,33 +48,35 @@ set_seed(42)
 class T5FineTuner(pl.LightningModule):
     def __init__(self, hparams):
         super(T5FineTuner, self).__init__()
-        self.hparams = hparams
+        self.save_hyperparameters(hparams)
 
         self.model = T5ForConditionalGeneration.from_pretrained(hparams.model_name_or_path)
         self.tokenizer = T5Tokenizer.from_pretrained(hparams.tokenizer_name_or_path)
+        self.training_step_outputs = []
+        self.validation_step_outputs = []
 
     def is_logger(self):
-        return self.trainer.proc_rank <= 0
+        return self.trainer.global_rank <= 0
 
     def forward(
-            self, input_ids, attention_mask=None, decoder_input_ids=None, decoder_attention_mask=None, lm_labels=None
+            self, input_ids, attention_mask=None, decoder_input_ids=None, decoder_attention_mask=None, labels=None
     ):
         return self.model(
             input_ids,
             attention_mask=attention_mask,
             decoder_input_ids=decoder_input_ids,
             decoder_attention_mask=decoder_attention_mask,
-            lm_labels=lm_labels,
+            labels=labels,
         )
 
     def _step(self, batch):
-        lm_labels = batch["target_ids"]
-        lm_labels[lm_labels[:, :] == self.tokenizer.pad_token_id] = -100
+        labels = batch["target_ids"]
+        labels[labels[:, :] == self.tokenizer.pad_token_id] = -100
 
         outputs = self(
             input_ids=batch["source_ids"],
             attention_mask=batch["source_mask"],
-            lm_labels=lm_labels,
+            labels=labels,
             decoder_attention_mask=batch['target_mask']
         )
 
@@ -79,23 +86,24 @@ class T5FineTuner(pl.LightningModule):
 
     def training_step(self, batch, batch_idx):
         loss = self._step(batch)
-
+        self.training_step_outputs.append(loss)
         tensorboard_logs = {"train_loss": loss}
         return {"loss": loss, "log": tensorboard_logs}
 
-    def training_epoch_end(self, outputs):
-        avg_train_loss = torch.stack([x["loss"] for x in outputs]).mean()
-        tensorboard_logs = {"avg_train_loss": avg_train_loss}
-        return {"avg_train_loss": avg_train_loss, "log": tensorboard_logs, 'progress_bar': tensorboard_logs}
+    def on_train_epoch_end(self):
+        epoch_average = torch.stack(self.training_step_outputs).mean()
+        self.log("training_epoch_average", epoch_average)
+        self.training_step_outputs.clear()  # free memory
 
     def validation_step(self, batch, batch_idx):
         loss = self._step(batch)
+        self.validation_step_outputs.append(loss)
         return {"val_loss": loss}
 
-    def validation_epoch_end(self, outputs):
-        avg_loss = torch.stack([x["val_loss"] for x in outputs]).mean()
-        tensorboard_logs = {"val_loss": avg_loss}
-        return {"avg_val_loss": avg_loss, "log": tensorboard_logs, 'progress_bar': tensorboard_logs}
+    def on_validation_epoch_end(self):
+        epoch_average = torch.stack(self.validation_step_outputs).mean()
+        self.log("validation_epoch_average", epoch_average)
+        self.validation_step_outputs.clear()  # free memory
 
     def configure_optimizers(self):
         "Prepare optimizer and schedule (linear warmup and decay)"
@@ -116,11 +124,12 @@ class T5FineTuner(pl.LightningModule):
         self.opt = optimizer
         return [optimizer]
 
-    def optimizer_step(self, epoch, batch_idx, optimizer, optimizer_idx, second_order_closure=None):
-        if self.trainer.use_tpu:
-            xm.optimizer_step(optimizer)
-        else:
-            optimizer.step()
+    def optimizer_step(self, epoch: int, batch_idx: int, optimizer: Union[Optimizer, LightningOptimizer], optimizer_closure: Optional[Callable[[], Any]]):
+        # if self.trainer.use_tpu:
+        #    xm.optimizer_step(optimizer)
+        # else:
+        #    optimizer.step()
+        optimizer.step(closure=optimizer_closure)
         optimizer.zero_grad()
         self.lr_scheduler.step()
 
@@ -147,8 +156,6 @@ class T5FineTuner(pl.LightningModule):
     def val_dataloader(self):
         val_dataset = get_dataset(tokenizer=self.tokenizer, type_path="val", args=self.hparams)
         return DataLoader(val_dataset, batch_size=self.hparams.eval_batch_size, num_workers=4)
-
-    logger = logging.getLogger(__name__)
 
     class LoggingCallback(pl.Callback):
         def on_validation_end(self, trainer, pl_module):
@@ -275,19 +282,20 @@ args_dict.update({'data_dir': 'aclImdb', 'output_dir': 't5_imdb_sentiment', 'num
 args = argparse.Namespace(**args_dict)
 
 checkpoint_callback = pl.callbacks.ModelCheckpoint(
-    filepath=args.output_dir, prefix="checkpoint", monitor="val_loss", mode="min", save_top_k=5
+    dirpath=args.output_dir, filename="checkpoint", monitor="val_loss", mode="min", save_top_k=5
 )
 
 train_params = dict(
     accumulate_grad_batches=args.gradient_accumulation_steps,
-    gpus=args.n_gpu,
+    accelerator='gpu',
+    # gpus=args.n_gpu,
     max_epochs=args.num_train_epochs,
-    early_stop_callback=False,
+    # early_stop_callback=False,
     precision=16 if args.fp_16 else 32,
-    amp_level=args.opt_level,
+    # amp_level=args.opt_level,
     gradient_clip_val=args.max_grad_norm,
     checkpoint_callback=checkpoint_callback,
-    callbacks=[LoggingCallback()],
+    callbacks=[LoggingCallback(), checkpoint_callback],
 )
 
 
