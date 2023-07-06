@@ -291,18 +291,18 @@ class ImdbDataset(Dataset):
             self.targets.append(tokenized_targets)
 
 
-#set_seed(42)
-#tokenizer = T5Tokenizer.from_pretrained('t5-base')
+set_seed(42)
+tokenizer = T5Tokenizer.from_pretrained('t5-base')
 
-#ids_neg = tokenizer.encode('negative </s>')
-#ids_pos = tokenizer.encode('positive </s>')
-#len(ids_neg), len(ids_pos)
-#dataset = ImdbDataset(tokenizer, 'aclImdb', 'val', max_len=512)
-#len(dataset)
+ids_neg = tokenizer.encode('negative </s>')
+ids_pos = tokenizer.encode('positive </s>')
+len(ids_neg), len(ids_pos)
+dataset = ImdbDataset(tokenizer, 'aclImdb', 'val', max_len=512)
+len(dataset)
 
-#data = dataset[28]
-#print(tokenizer.decode(data['source_ids']))
-#print(tokenizer.decode(data['target_ids']))
+data = dataset[28]
+print(tokenizer.decode(data['source_ids']))
+print(tokenizer.decode(data['target_ids']))
 
 args_dict.update({'data_dir': 'aclImdb', 'output_dir': 't5_imdb_sentiment', 'num_train_epochs': 2})
 args = argparse.Namespace(**args_dict)

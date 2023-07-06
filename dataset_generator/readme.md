@@ -62,3 +62,14 @@ Execute
 This will read all the extracted operations and fragments from Step 1 and combine them into one singular `dataset.json` file.
 In this step, only operations are considered and fragments are ignored.
 JSON format is used for increased performance in comparison to YAML.
+
+
+
+TODO:
+To queries add: file path, repo name, commit ID
+
+
+Options: 
+CodeT5: produce "consistent" or "inconsistent"
+
+OR: attach smaller model on top of codet5 (classification head)
