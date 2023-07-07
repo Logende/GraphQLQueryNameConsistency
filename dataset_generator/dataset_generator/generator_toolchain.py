@@ -20,7 +20,9 @@ if __name__ == '__main__':
     root_path = Path(dir_name).parent
     dependents_csv_path = root_path.joinpath("collected_dependents").joinpath("dependents_apollo-client.csv")
     dependents_csv_path_new = root_path.joinpath("collected_dependents" + suffix).joinpath("dependents_apollo-client.csv")
-    dependents_csv_path_new.parent.mkdir()
+
+    if not dependents_csv_path_new.parent.exists():
+        dependents_csv_path_new.parent.mkdir()
 
     print("Start generator toolchain with repo " + str(start_index) + " to " + str(end_index) + ".")
     print("Create subset of dependents file: " + str(dependents_csv_path_new))
