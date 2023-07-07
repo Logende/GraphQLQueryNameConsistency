@@ -33,6 +33,9 @@ def main(suffix=None):
                         print("Start cloning Repo " + repo_name + ".")
                         repo = Repo.clone_from("https://github.com/" + repo_name, result_folder)
 
+                print("Went through all requested repos!")
+                break
+
             except Exception as e:
                 print("Exception occurred: '" + str(e) + "'.")
 
