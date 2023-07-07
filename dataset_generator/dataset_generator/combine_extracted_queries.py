@@ -1,4 +1,5 @@
 import os
+import sys
 from pathlib import Path
 from typing import List
 
@@ -35,10 +36,10 @@ def persist_dataset(file_path: Path, data: List[Operation | Fragment]):
         json.dump(operations, writer)
 
 
-if __name__ == '__main__':
+def main(suffix=None):
     dir_name = os.path.dirname(os.path.realpath(__file__))
     root_path = Path(dir_name).parent
-    queries_path = root_path.joinpath("collected_queries")
+    queries_path = root_path.joinpath("collected_queries" + suffix)
 
     all_data = []
     for path in Path(queries_path).glob("*.yaml"):
@@ -47,4 +48,10 @@ if __name__ == '__main__':
             subset_data = load_extracted_data(path)
             all_data.extend(subset_data)
 
-    persist_dataset(root_path.joinpath("dataset_pos.json"), all_data)
+    persist_dataset(root_path.joinpath("dataset_pos" + suffix + ".json"), all_data)
+
+
+if __name__ == '__main__':
+    arg1 = sys.argv[1]
+    folder_suffix = arg1 if arg1 is not None else ""
+    main(folder_suffix)

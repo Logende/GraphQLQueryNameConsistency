@@ -1,5 +1,6 @@
 import re
 import os
+import sys
 from pathlib import Path
 from typing import List, Dict
 
@@ -145,11 +146,11 @@ def persist_extracted_data(file_path: Path, data: List[Operation | Fragment]):
         yaml.safe_dump(new_data, writer)
 
 
-if __name__ == '__main__':
+def main(suffix=None):
     dir_name = os.path.dirname(os.path.realpath(__file__))
     root_path = Path(dir_name).parent
-    repositories_path = root_path.joinpath("collected_repos")
-    queries_path = root_path.joinpath("collected_queries")
+    repositories_path = root_path.joinpath("collected_repos" + suffix)
+    queries_path = root_path.joinpath("collected_queries" + suffix)
 
     if not queries_path.exists():
         print("Folder " + str(queries_path) + " does not exist yet. Creating it.")
@@ -165,3 +166,9 @@ if __name__ == '__main__':
             result = extract_queries_from_repo(repository_path)
             repo_name = str(repository_path.name)
             persist_extracted_data(queries_path.joinpath(repo_name + ".yaml"), result)
+
+
+if __name__ == '__main__':
+    arg1 = sys.argv[1]
+    folder_suffix = arg1 if arg1 is not None else ""
+    main(folder_suffix)

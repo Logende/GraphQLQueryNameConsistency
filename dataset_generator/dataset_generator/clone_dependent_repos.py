@@ -1,14 +1,19 @@
 from git import Repo
 import os
+import sys
 from pathlib import Path
 
 import csv
 
-if __name__ == '__main__':
+
+def main(suffix=None):
     dir_name = os.path.dirname(os.path.realpath(__file__))
     root_path = Path(dir_name).parent
-    dependents_csv_path = root_path.joinpath("collected_dependents").joinpath("dependents_apollo-client.csv")
-    result_repositories_path = root_path.joinpath("collected_repos")
+    dependents_csv_path = root_path.joinpath("collected_dependents" + suffix).joinpath("dependents_apollo-client.csv")
+    result_repositories_path = root_path.joinpath("collected_repos" + suffix)
+
+    if not result_repositories_path.exists():
+        result_repositories_path.mkdir()
 
     print("Begin endless cloning process.")
 
@@ -30,3 +35,9 @@ if __name__ == '__main__':
 
             except Exception as e:
                 print("Exception occurred: '" + str(e) + "'.")
+
+
+if __name__ == '__main__':
+    arg1 = sys.argv[1]
+    folder_suffix = arg1 if arg1 is not None else ""
+    main(folder_suffix)
