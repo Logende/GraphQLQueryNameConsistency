@@ -47,4 +47,4 @@ if __name__ == '__main__':
             subset_data = load_extracted_data(path)
             all_data.extend(subset_data)
 
-    persist_dataset(root_path.joinpath("dataset.json"), all_data)
+    persist_dataset(root_path.joinpath("dataset_pos.json"), all_data)
