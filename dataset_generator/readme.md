@@ -1,5 +1,24 @@
 # Building dataset
+This section describes the dataset generation toolchain.
 
+**Usage in short (see below for more explanation):**
+
+As the list of dependent repositories is checked into this repo, it is not needed to generate it again.
+If you want to generate it anyway, then
+
+Execute `python3 dataset_generator/find_dependent_repositories.py`
+
+This will generate a CSV file containing a list of 1000 repos that use the Apollo Client.
+
+Execute `python3 dataset_generator/generator_toolchain.py <repo_range_start> <repo_range_end>`
+
+This will clone the repos from the CSV within the provided range (max possible range is 1 to 1000),
+extract GraphQl queries from those repos and put them together into a positive dataset.
+Next, it will generate a negative dataset by randomly mixing the positive query-name pairs up.
+
+Note that the generator_toolchain can be called multiple times in parallel (e.g. first with range 1 to 99, then 100 to 199, etc.).
+
+See `dataset_generator/QuickDatasetGenerator.ipynb` for an example of how to generate the dataset.
 ## Find suitable repos
 
 Decision: focus on JavaScript/Typescript projects. 
@@ -25,10 +44,14 @@ The resulting CSV of identified repositories is stored in `collected_dependents/
 Execute
 `python3 dataset_generator/clone_dependent_repos.py`
 
-This will clone all of the dependent repositories (listed in `collected_dependents/dependents_apollo-client.csv`) into a `collected_repos` folder.
+This will clone all the dependent repositories (listed in `collected_dependents/dependents_apollo-client.csv`) into a `collected_repos` folder.
 
 Problem: attempting to clone the repo `liferay/liferay-portal` lead to a `file too large` error. 
 This was solved by manually removing this repo from the list of collected dependents.
+
+Problem 2: sometimes the cloning process will fail. 
+This was solved by putting an endless loop and a try-catch-block around the cloning process.
+Whenever the process fails, it will just start all the cloning again, but skip repos that were already successfully cloned before.
 
 ## Extract GraphQL queries (and mutations)
 
@@ -59,17 +82,22 @@ Extracted fragments and operations will be persisted in a YAML file inside the `
 Execute
 `python3 dataset_generator/combine_extracted_queries.py`
 
-This will read all the extracted operations and fragments from Step 1 and combine them into one singular `dataset.json` file.
+This will read all the extracted operations and fragments from Step 1 and combine them into one singular `dataset_pos.json` file.
 In this step, only operations are considered and fragments are ignored.
 JSON format is used for increased performance in comparison to YAML.
 
+## Generate negative dataset
 
+Execute
+`python3 dataset_generator/generate_negative_dataset.py`
+
+This will randomly mix up name-query pairs of the positive dataset and put the results into a new file `dataset_neg_json`.
+The length of the negative dataset will be the same as the length of the positive dataset.
+
+## Splitting into train, validation and test
+TODO: write this
 
 TODO:
 To queries add: file path, repo name, commit ID
 
-
-Options: 
-CodeT5: produce "consistent" or "inconsistent"
-
-OR: attach smaller model on top of codet5 (classification head)
+# Finetuning
