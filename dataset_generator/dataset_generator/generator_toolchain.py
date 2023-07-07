@@ -31,7 +31,8 @@ if __name__ == '__main__':
         writer = csv.writer(o, delimiter=',')  # adjust as necessary
         index = 0
         for row in reader:
-            if index >= start_index:
+            # Always write first row, which is the header
+            if index == 0 or index >= start_index:
                 if index > end_index:
                     break
                 writer.writerow(row)
