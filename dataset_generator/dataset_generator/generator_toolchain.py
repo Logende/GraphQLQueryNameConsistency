@@ -48,3 +48,13 @@ if __name__ == '__main__':
 
     print("Generate negative dataset")
     generate_negative_dataset.main(suffix)
+
+    print("Positive dataset:")
+    dataset_pos_path = root_path.joinpath("dataset_pos" + suffix + ".json")
+    with open(dataset_pos_path, 'r') as reader:
+        print(reader.read())
+
+    print("Negative dataset:")
+    dataset_neg_path = root_path.joinpath("dataset_neg" + suffix + ".json")
+    with open(dataset_neg_path, 'r') as reader:
+        print(reader.read())
