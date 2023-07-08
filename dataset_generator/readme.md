@@ -85,7 +85,7 @@ The rest of the operation will be stored as operation content.
 Extracted fragments and operations will be persisted in a YAML file inside the `colleced_queries` folder, one file for each repository.
 
 Problem: somehow, a few of the files lead to the regular expression matching to take more than five hours (maybe forever?).
-Solution: instead of the reg library, use regex, which supports timeouts. Then set timeouts for the pattern matching.
+Solution: instead of the re library, use regex, which supports timeouts. Then set timeouts for the pattern matching.
 
 Example of this issue:
 
