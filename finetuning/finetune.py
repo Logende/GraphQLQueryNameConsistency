@@ -240,11 +240,6 @@ class T5FineTuner(pl.LightningModule):
 if __name__ == '__main__':
     set_seed(42)
 
-    dir_name = os.path.dirname(os.path.realpath(__file__))
-    root_path = Path(dir_name).parent
-    dataset_pos_path = root_path.joinpath("dataset_generator").joinpath("dataset_pos.json")
-    dataset_neg_path = root_path.joinpath("dataset_generator").joinpath("dataset_pos.json")
-
     args_dict = dict(
         data_dir="",  # path for data files
         output_dir="",  # path to save the checkpoints
