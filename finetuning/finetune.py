@@ -109,11 +109,11 @@ class GraphQlDataset(Dataset):
 
             # tokenize inputs
             tokenized_inputs = self.tokenizer.batch_encode_plus(
-                [line], max_length=self.max_len, pad_to_max_length=True, return_tensors="pt"
+                [line], max_length=self.max_len, pad_to_max_length=True, return_tensors="pt", truncation='only_first'
             )
             # tokenize targets
             tokenized_targets = self.tokenizer.batch_encode_plus(
-                [target], max_length=2, pad_to_max_length=True, return_tensors="pt"
+                [target], max_length=2, pad_to_max_length=True, return_tensors="pt", truncation='only_first'
             )
 
             self.inputs.append(tokenized_inputs)
@@ -132,7 +132,7 @@ class T5FineTuner(pl.LightningModule):
         self.validation_step_outputs = []
         # pdb.set_trace()
         self.model = T5ForConditionalGeneration.from_pretrained(hparams.model_name_or_path)
-        self.tokenizer = T5Tokenizer.from_pretrained(hparams.tokenizer_name_or_path)
+        self.tokenizer = RobertaTokenizer.from_pretrained(hparams.tokenizer_name_or_path)
 
     def is_logger(self):
         return self.trainer.global_rank <= 0
