@@ -248,8 +248,8 @@ if __name__ == '__main__':
     args_dict = dict(
         data_dir="",  # path for data files
         output_dir="",  # path to save the checkpoints
-        model_name_or_path='t5-base',
-        tokenizer_name_or_path='t5-base',
+        model_name_or_path='Salesforce/codet5-small',
+        tokenizer_name_or_path='Salesforce/codet5-small',
         max_seq_length=512,
         learning_rate=3e-4,
         weight_decay=0.0,
@@ -268,14 +268,14 @@ if __name__ == '__main__':
     )
 
     # Prepare tokenizer
-    tokenizer = T5Tokenizer.from_pretrained('t5-base')
+    tokenizer = T5Tokenizer.from_pretrained('Salesforce/codet5-small')
 
     ids_neg = tokenizer.encode('inconsistent </s>')
     ids_pos = tokenizer.encode('consistent </s>')
     len(ids_neg), len(ids_pos)
 
     # Prepare dataset
-    dataset = GraphQlDataset(tokenizer, 'graphql_dataset', 'val', max_len=512)
+    dataset = GraphQlDataset(tokenizer, 'tune', 'val', max_len=512)
     len(dataset)
 
     data = dataset[28]
@@ -283,7 +283,7 @@ if __name__ == '__main__':
     print(tokenizer.decode(data['target_ids']))
 
     # Continue with model
-    args_dict.update({'data_dir': 'graphql_dataset', 'output_dir': 't5_graphql_consistency', 'num_train_epochs': 2})
+    args_dict.update({'data_dir': 'tune', 'output_dir': 'codet5_graphql_consistency', 'num_train_epochs': 2})
     args = argparse.Namespace(**args_dict)
 
     checkpoint_callback = pl.callbacks.ModelCheckpoint(
@@ -307,4 +307,4 @@ if __name__ == '__main__':
     trainer.fit(model)
 
     ## save the model this way so next time you can load it using T5ForConditionalGeneration.from_pretrained
-    model.model.save_pretrained('t5_base_graphql_consistency')
+    model.model.save_pretrained('codet5_graphql_consistency')
