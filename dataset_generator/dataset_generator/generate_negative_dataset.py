@@ -18,12 +18,22 @@ def generate_negative_dataset(file_path: Path, dataset_pos: List[dict]):
         operation_1 = pair[0]
         operation_2 = pair[1]
         if operation_1 != operation_2:
-            result.append({"type": operation_1["type"],
-                           "name": operation_1["name"],
-                           "content": operation_2["content"]})
-            result.append({"type": operation_2["type"],
-                           "name": operation_2["name"],
-                           "content": operation_1["content"]})
+            result.append({
+                "type": operation_1["type"],
+                "name": operation_1["name"],
+                "content": operation_2["content"],
+                "metadata_type": operation_1["metadata"],
+                "metadata_name": operation_1["metadata"],
+                "metadata_content": operation_2["metadata"]
+            })
+            result.append({
+                "type": operation_2["type"],
+                "name": operation_2["name"],
+                "content": operation_1["content"],
+                "metadata_type": operation_2["metadata"],
+                "metadata_name": operation_2["metadata"],
+                "metadata_content": operation_1["metadata"]
+            })
 
     # result is exponentially bigger than dataset_pos. Therefore, randomly pick len(dataset_pos) entry
     # to get dataset with same amount of negative samples as positive

@@ -21,10 +21,10 @@ def load_extracted_data(file_path: Path) -> List[Operation | Fragment]:
         fragments = data["fragments"]
         operations = data["operations"]
         for fragment_data in fragments:
-            result_list.append(Fragment(content=fragment_data["content"]))
+            result_list.append(Fragment(content=fragment_data["content"], metadata=fragment_data["metadata"]))
         for operation_data in operations:
             result_list.append(Operation(content=operation_data["content"], operation_type=operation_data["type"],
-                                         operation_name=operation_data["name"]))
+                                         operation_name=operation_data["name"], metadata=operation_data["metadata"]))
     return result_list
 
 
