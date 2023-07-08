@@ -41,6 +41,9 @@ def main(suffix=None):
 
 
 if __name__ == '__main__':
-    arg1 = sys.argv[1]
-    folder_suffix = arg1 if arg1 is not None else ""
+    args = sys.argv
+    if len(args) >= 2:
+        folder_suffix = args[1]
+    else:
+        folder_suffix = ""
     main(folder_suffix)

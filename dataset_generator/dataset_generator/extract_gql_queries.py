@@ -1,13 +1,13 @@
-import re
+import regex as re
 import os
 import sys
 from pathlib import Path
 from typing import List, Dict
+import git
 
 import yaml
 
 from gql_model import Fragment, Operation
-
 
 relevant_file_patterns = ("*.js", "*.ts", "*.jsx", "*.tsx")
 
@@ -16,7 +16,7 @@ def extract_constants_from_text(data: str) -> Dict:
     all_results = {}
     # Seems like query string literals have a gql prefix: gql`query_content'
     regex = r"export\s+const\s+(\w+)\s*\=\s*`((\s|((?!`).)*)+)`"
-    matches = re.finditer(regex, data, re.MULTILINE)
+    matches = re.finditer(regex, data, re.MULTILINE, timeout=5)
     if matches:
         for _, match in enumerate(matches, start=1):
             all_results[match.group(1)] = match.group(2)
@@ -51,7 +51,7 @@ def extract_gql_sections_from_text(data: str) -> List[str]:
     all_results = []
     # Seems like query string literals have a gql prefix: gql`query_content'
     regex = r"gql`(\s|((?!`).)*)+`"
-    matches = re.finditer(regex, data, re.MULTILINE)
+    matches = re.finditer(regex, data, re.MULTILINE, timeout=5)
     if matches:
         index = 0
         for _, match in enumerate(matches, start=1):
@@ -70,19 +70,6 @@ def extract_gql_sections_from_file(file_path: Path) -> List[str]:
         except UnicodeDecodeError:
             print("Unable to decode file " + str(file_path))
             return []
-
-
-def extract_gql_sections(all_relevant_files: List[Path]) -> List[str]:
-    all_results = []
-
-    for file_path in all_relevant_files:
-        print("Extract GQL sections from file " + str(file_path))
-        if not file_path.is_file() or file_path.is_dir():
-            continue
-        else:
-            sub_results = extract_gql_sections_from_file(file_path)
-            all_results.extend(sub_results)
-    return all_results
 
 
 def glob_relevant_files(repo_path: Path) -> List[Path]:
@@ -115,28 +102,54 @@ def extract_operation_or_fragment(gql_section: str, constants: Dict) -> Fragment
     content = content.removeprefix(operation_type).strip()
 
     if operation_type == "fragment":
-        return Fragment(content)
+        return Fragment(content, metadata={})
 
     elif operation_type == "query" or operation_type == "mutation" or operation_type == "subscription":
         next_curly_bracket = content.find("{")
         operation_name = content[0: next_curly_bracket].strip()
         operation_content = content[next_curly_bracket: len(content)].strip()
-        return Operation(operation_type=operation_type, operation_name=operation_name, content=operation_content)
+        return Operation(operation_type=operation_type, operation_name=operation_name, content=operation_content, metadata={})
+
+
+def extract_queries_from_file(file_path: Path, constants: dict) -> List[Operation | Fragment]:
+    gql_sections = extract_gql_sections_from_file(file_path)
+    result_list = [extract_operation_or_fragment(section, constants) for section in gql_sections]
+    return [v for v in result_list if v is not None]
 
 
 def extract_queries_from_repo(repo_path: Path) -> List[Operation | Fragment]:
+    # Try to extract commit hash for metadata
+    try:
+        repo = git.Repo(repo_path)
+        commit_hash = repo.head.object.hexsha
+    except:
+        commit_hash = "Unknown"
+
+    # Find all relevant files for extraction process (ending with .ts, .js, and more)
     all_relevant_files = glob_relevant_files(repo_path)
-    print("Extracting query-name-pairs from repository " + str(repo_path) +
-          " having " + str(len(all_relevant_files)) + " candidate files.")
 
-    gql_sections = extract_gql_sections(all_relevant_files)
-    print("Found " + (str(len(gql_sections))) + " gql strings in the repository.")
-
+    # Extract all constants because they might be used in some query strings
     constants = extract_constants(all_relevant_files)
     print("Found " + (str(len(constants))) + " constants in the repository.")
 
-    result_list = [extract_operation_or_fragment(section, constants) for section in gql_sections]
-    return [v for v in result_list if v is not None]
+    # Go over all relevant files and extract GQL sections from them
+    all_queries: List[Operation | Fragment] = []
+    for file_path in all_relevant_files:
+        if not file_path.is_file() or file_path.is_dir():
+            continue
+        else:
+            metadata = {
+                "repo": str(repo_path.name),
+                "file": str(file_path.relative_to(repo_path)),
+                "commit_hash": commit_hash
+            }
+
+            queries_from_file = extract_queries_from_file(file_path, constants)
+            for entry in queries_from_file:
+                entry.metadata = metadata
+            all_queries.extend(queries_from_file)
+    print("Extracted " + (str(len(all_queries))) + " queries from the repository.")
+    return all_queries
 
 
 def persist_extracted_data(file_path: Path, data: List[Operation | Fragment]):
@@ -173,6 +186,9 @@ def main(suffix=None):
 
 
 if __name__ == '__main__':
-    arg1 = sys.argv[1]
-    folder_suffix = arg1 if arg1 is not None else ""
+    args = sys.argv
+    if len(args) >= 2:
+        folder_suffix = args[1]
+    else:
+        folder_suffix = ""
     main(folder_suffix)
