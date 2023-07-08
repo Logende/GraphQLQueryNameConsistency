@@ -21,7 +21,11 @@ Note that the generator_toolchain can be called multiple times in parallel (e.g.
 ![Screenshot of data generation process (multiple tabs in parallel)](parallel_data_generation_3.png)
 ![Screenshot 2 of data generation process (multiple tabs in parallel)](parallel_data_generation.png)
 
-See `dataset_generator/QuickDatasetGenerator.ipynb` for an example of how to generate the dataset.
+See `dataset_generator/QuickDatasetGenerator.ipynb` for an example of how to generate a dataset subset.
+
+Finally, execute `python3 dataset_generator/combine_and_split_datasets.py` to merge all dataset subsets and then split them into train, validation and test. 
+
+
 ## Find suitable repos
 
 Decision: focus on JavaScript/Typescript projects. 
@@ -124,7 +128,7 @@ on the data
 Execute
 `python3 dataset_generator/combine_extracted_queries.py`
 
-This will read all the extracted operations and fragments from Step 1 and combine them into one singular `dataset_pos.json` file.
+This will read all the extracted operations and fragments from Step 1 and combine them into one singular `collected_datasets/dataset_pos.json` file.
 In this step, only operations are considered and fragments are ignored.
 JSON format is used for increased performance in comparison to YAML.
 
@@ -133,11 +137,14 @@ JSON format is used for increased performance in comparison to YAML.
 Execute
 `python3 dataset_generator/generate_negative_dataset.py`
 
-This will randomly mix up name-query pairs of the positive dataset and put the results into a new file `dataset_neg_json`.
+This will randomly mix up name-query pairs of the positive dataset and put the results into a new file `collected_datasets/dataset_neg_json`.
 The length of the negative dataset will be the same as the length of the positive dataset.
 
 ## Splitting into train, validation and test
-TODO: write this
 
-TODO:
-To queries add: file path, repo name, commit ID
+Finally, execute 
+`python3 dataset_generator/combine_and_split_datasets.py`
+
+This will load all generated datasets from the `collected_datasets` folder. It will differentiate between positive and negative datasets.
+The positive (or negative) datasets are then merged and then split into 80% training dataset, 10% validation dataset and 10% test dataset.
+The results are persisted under the folder `final_datasets`.

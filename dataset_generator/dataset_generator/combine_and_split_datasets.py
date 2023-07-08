@@ -38,8 +38,8 @@ def main():
     datasets_path = root_path.joinpath("collected_datasets")
     final_datasets_path = root_path.joinpath("final_datasets")
 
-    datasets_pos_path = datasets_path.rglob("dataset_pos_*")
-    datasets_neg_path = datasets_path.rglob("dataset_neg_*")
+    datasets_pos_path = datasets_path.rglob("dataset_pos*")
+    datasets_neg_path = datasets_path.rglob("dataset_neg*")
 
     dataset_pos = read_and_combine_datasets(datasets_pos_path)
     dataset_neg = read_and_combine_datasets(datasets_neg_path)
