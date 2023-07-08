@@ -39,6 +39,15 @@ def main(suffix=None):
             except Exception as e:
                 print("Exception occurred: '" + str(e) + "'.")
 
+                if "fatal: could not read Username for 'https://github.com': No such device or address" in str(e):
+                    print("Seems like repo " + repo_name + " does no longer exist.")
+                    print("Creating empty folder so the program will not attempt cloning it again")
+
+                    if result_folder.exists():
+                        print("Warning: Folder " + str(result_folder) + " already exists.")
+                    else:
+                        result_folder.mkdir()
+
 
 if __name__ == '__main__':
     args = sys.argv
