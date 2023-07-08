@@ -1,23 +1,16 @@
 import os
-from pathlib import Path
 import argparse
-import glob
 import json
-import time
 import logging
 import random
 import re
 import ipdb as pdb
 from tqdm import tqdm
-from itertools import chain
-from string import punctuation
-from transformers import T5Model, T5Tokenizer
+from transformers import RobertaTokenizer
 import nltk
 
 nltk.download('punkt')
 
-from nltk.tokenize import sent_tokenize
-import pandas as pd
 import numpy as np
 import torch
 from torch.utils.data import Dataset, DataLoader
@@ -263,7 +256,7 @@ if __name__ == '__main__':
     )
 
     # Prepare tokenizer
-    tokenizer = T5Tokenizer.from_pretrained('Salesforce/codet5-small')
+    tokenizer = RobertaTokenizer.from_pretrained('Salesforce/codet5-small')
 
     ids_neg = tokenizer.encode('inconsistent </s>')
     ids_pos = tokenizer.encode('consistent </s>')
