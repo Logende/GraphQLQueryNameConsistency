@@ -76,6 +76,7 @@ def extract_gql_sections(all_relevant_files: List[Path]) -> List[str]:
     all_results = []
 
     for file_path in all_relevant_files:
+        print("Extract GQL sections from file " + str(file_path))
         if not file_path.is_file() or file_path.is_dir():
             continue
         else:
