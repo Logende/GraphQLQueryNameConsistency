@@ -18,6 +18,9 @@ Next, it will generate a negative dataset by randomly mixing the positive query-
 
 Note that the generator_toolchain can be called multiple times in parallel (e.g. first with range 1 to 99, then 100 to 199, etc.).
 
+![Screenshot of data generation process (multiple tabs in parallel)](parallel_data_generation_3.png)
+![Screenshot 2 of data generation process (multiple tabs in parallel)](parallel_data_generation.png)
+
 See `dataset_generator/QuickDatasetGenerator.ipynb` for an example of how to generate the dataset.
 ## Find suitable repos
 
@@ -53,6 +56,10 @@ Problem 2: sometimes the cloning process will fail.
 This was solved by putting an endless loop and a try-catch-block around the cloning process.
 Whenever the process fails, it will just start all the cloning again, but skip repos that were already successfully cloned before.
 
+Problem 3: sometimes a repository does no longer exist. 
+This was solved by explicitly catching this scenario and then creating an empty repository folder, so the endless cloning loop will not attempt to clone it again.
+
+
 ## Extract GraphQL queries (and mutations)
 
 ### Step 1
@@ -77,6 +84,41 @@ The rest of the operation will be stored as operation content.
 
 Extracted fragments and operations will be persisted in a YAML file inside the `colleced_queries` folder, one file for each repository.
 
+Problem: somehow, a few of the files lead to the regular expression matching to take more than five hours (maybe forever?).
+Solution: instead of the reg library, use regex, which supports timeouts. Then set timeouts for the pattern matching.
+
+Example of this issue:
+
+````
+    regex = r"gql`(\s|((?!`).)*)+`"
+    matches = re.finditer(regex, data, re.MULTILINE)
+    
+    for _, match in enumerate(matches, start=1):
+        print("This loop will take forever or at least very long")
+````
+
+on the data
+````
+// create a component to use the apollo library react hooks to feth the pair data from the subgraph
+// import {useQuery} from '@apollo/react-hooks';
+// import {gql} from '@apollo/client';
+// import {BigNumber} from 'ethers';
+//
+// const UBE_SUBGRAPH = "https://api.thegraph.com/subgraphs/name/ubeswap/ubeswap"
+//
+// const PAIR_QUERY = gql`
+//     query GetPair($pair: String!){
+//         pair(id: $pair) {
+//             id
+//             name
+//             symbol
+//             decimals
+//             derivedCUSD
+//             tradeVolumeUSD
+//             totalLiquidity
+//             txCount
+````
+
 ### Step 2
 
 Execute
@@ -99,5 +141,3 @@ TODO: write this
 
 TODO:
 To queries add: file path, repo name, commit ID
-
-# Finetuning

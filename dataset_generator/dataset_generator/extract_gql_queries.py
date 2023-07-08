@@ -126,6 +126,7 @@ def extract_queries_from_repo(repo_path: Path) -> List[Operation | Fragment]:
 
     # Find all relevant files for extraction process (ending with .ts, .js, and more)
     all_relevant_files = glob_relevant_files(repo_path)
+    print("Found " + (str(len(all_relevant_files))) + " candidate files in the repository.")
 
     # Extract all constants because they might be used in some query strings
     constants = extract_constants(all_relevant_files)

@@ -40,6 +40,10 @@ def main(suffix=None):
     dir_name = os.path.dirname(os.path.realpath(__file__))
     root_path = Path(dir_name).parent
     queries_path = root_path.joinpath("collected_queries" + suffix)
+    datasets_path = root_path.joinpath("collected_datasets")
+
+    if not datasets_path.exists():
+        datasets_path.mkdir()
 
     all_data = []
     for path in Path(queries_path).glob("*.yaml"):
@@ -48,7 +52,7 @@ def main(suffix=None):
             subset_data = load_extracted_data(path)
             all_data.extend(subset_data)
 
-    persist_dataset(root_path.joinpath("dataset_pos" + suffix + ".json"), all_data)
+    persist_dataset(datasets_path.joinpath("dataset_pos" + suffix + ".json"), all_data)
 
 
 if __name__ == '__main__':

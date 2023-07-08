@@ -45,8 +45,10 @@ def generate_negative_dataset(file_path: Path, dataset_pos: List[dict]):
 def main(suffix=None):
     dir_name = os.path.dirname(os.path.realpath(__file__))
     root_path = Path(dir_name).parent
-    dataset_pos_path = root_path.joinpath("dataset_pos" + suffix + ".json")
-    dataset_neg_path = root_path.joinpath("dataset_neg" + suffix + ".json")
+    datasets_path = root_path.joinpath("collected_datasets")
+
+    dataset_pos_path = datasets_path.joinpath("dataset_pos" + suffix + ".json")
+    dataset_neg_path = datasets_path.joinpath("dataset_neg" + suffix + ".json")
     with open(dataset_pos_path, 'r') as reader:
         dataset_pos = json.load(reader)
 
