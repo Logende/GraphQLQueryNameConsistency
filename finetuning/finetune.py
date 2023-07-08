@@ -103,12 +103,14 @@ class GraphQlDataset(Dataset):
 
         for data_entry in tqdm(dataset):
             content = data_entry["content"].strip()
-            name = data_entry["name"].strip()
+            content = REPLACE_NO_SPACE.sub("", content)
+            content = REPLACE_WITH_SPACE.sub("", content)
 
-            line = content + ' </s>' + name
-            line = REPLACE_NO_SPACE.sub("", line)
-            line = REPLACE_WITH_SPACE.sub("", line)
-            line = line + ' </s>'
+            name = data_entry["name"].strip()
+            name = REPLACE_NO_SPACE.sub("", name)
+            name = REPLACE_WITH_SPACE.sub("", name)
+
+            line = content + ' </s>' + name + ' </s>'
 
             target = consistency + " </s>"
 
