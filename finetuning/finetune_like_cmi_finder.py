@@ -256,8 +256,8 @@ class FineTuneCodeT5(FineTuneModel):
         self.model.save_pretrained(os.path.join(folder, "t5_classification_final.mdl"))
 
 
-class0 = "tune/codet5_real_preds_cons.npy"
-class1 = "tune/codet5_real_preds_incons.npy"
+class0 = "codet5_real_preds_cons.npy"
+class1 = "codet5_real_preds_incons.npy"
 output = "output_cmi"
 training_config = None
 output_dir = output
@@ -267,7 +267,7 @@ workers = 8
 seed = 42
 codet5_finetune = FineTuneCodeT5(training_config, output_dir, data_path, data_cache_path, workers, seed)
 codet5_finetune.set_train_data_file(class0)
-validation = "src/neural_models/empty_validation.jsonl"
+validation = "https://raw.githubusercontent.com/sola-st/CMI-Finder/main/src/neural_models/empty_validation.jsonl"
 codet5_finetune.set_validation_data_file(validation)
 codet5_finetune.train_from_scratch()
 codet5_finetune.save_model(output)
