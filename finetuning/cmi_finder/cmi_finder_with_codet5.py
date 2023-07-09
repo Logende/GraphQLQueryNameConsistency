@@ -113,7 +113,7 @@ class FineTuneModel():
             "fp16": false
         }'''
 
-        with open("default_config_file.json", "w") as dcf:
+        with open("../default_config_file.json", "w") as dcf:
             dcf.write(default_config)
 
         self.training_config = "default_config_file.json"
@@ -135,7 +135,7 @@ class FineTuneModel():
         print(os.getcwd())
         print("load dataset from " + str(self.data_path) + " and " + str(data_files))
         raw_datasets = load_dataset(
-            path="./",
+            path="../",
             data_dir=self.data_path,
             data_files=data_files,
             cache_dir=self.data_cache_path
@@ -261,7 +261,7 @@ class1 = "codet5_real_preds_incons.npy"
 output = "output_cmi"
 training_config = None
 output_dir = output
-data_path = "./"
+data_path = "../"
 data_cache_path = output
 workers = 8
 seed = 42

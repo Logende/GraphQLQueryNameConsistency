@@ -109,11 +109,13 @@ class GraphQlDataset(Dataset):
 
             # tokenize inputs
             tokenized_inputs = self.tokenizer.batch_encode_plus(
-                [line], max_length=self.max_len, pad_to_max_length=True, return_tensors="pt", truncation='longest_first'
+                [line], max_length=self.max_len, pad_to_max_length=True, return_tensors="pt", padding="max_length",
+                truncation=True
             )
             # tokenize targets
             tokenized_targets = self.tokenizer.batch_encode_plus(
-                [target], max_length=2, pad_to_max_length=True, return_tensors="pt", truncation='longest_first'
+                [target], max_length=2, pad_to_max_length=True, return_tensors="pt", padding="max_length",
+                truncation=True
             )
 
             self.inputs.append(tokenized_inputs)
