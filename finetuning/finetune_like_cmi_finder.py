@@ -1,17 +1,15 @@
 import torch
 from datasets import load_dataset
-from transformers import RobertaTokenizer, DataCollatorForSeq2Seq, TrainingArguments, Trainer
-from transformers import RobertaTokenizer, RobertaForMaskedLM
+from transformers import DataCollatorForSeq2Seq, TrainingArguments, Trainer
+from transformers import RobertaTokenizer
 from transformers.models.t5 import T5ForConditionalGeneration
 from transformers.trainer_utils import get_last_checkpoint
-from transformers import AutoTokenizer, AutoModel, AutoModelForSeq2SeqLM
-from transformers.utils import logging
-import signal
 import random
 import numpy as np
 from prettytable import PrettyTable
-import json
 import os
+import argparse
+import json
 
 
 class FineTuneModel():
@@ -135,6 +133,7 @@ class FineTuneModel():
         }
         import os
         print(os.getcwd())
+        print("load dataset from " + str(self.data_path) + " and " + str(data_files))
         raw_datasets = load_dataset(
             path="./",
             data_dir=self.data_path,
@@ -255,3 +254,20 @@ class FineTuneCodeT5(FineTuneModel):
 
     def save_model(self, folder):
         self.model.save_pretrained(os.path.join(folder, "t5_classification_final.mdl"))
+
+
+class0 = "tune/codet5_real_preds_cons.npy"
+class1 = "tune/codet5_real_preds_incons.npy"
+output = "output_cmi"
+training_config = None
+output_dir = output
+data_path = "./"
+data_cache_path = output
+workers = 8
+seed = 42
+codet5_finetune = FineTuneCodeT5(training_config, output_dir, data_path, data_cache_path, workers, seed)
+codet5_finetune.set_train_data_file(class0)
+validation = "src/neural_models/empty_validation.jsonl"
+codet5_finetune.set_validation_data_file(validation)
+codet5_finetune.train_from_scratch()
+codet5_finetune.save_model(output)
