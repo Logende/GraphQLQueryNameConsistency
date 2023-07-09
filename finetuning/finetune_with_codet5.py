@@ -109,11 +109,11 @@ class GraphQlDataset(Dataset):
 
             # tokenize inputs
             tokenized_inputs = self.tokenizer.batch_encode_plus(
-                [line], max_length=self.max_len, pad_to_max_length=True, return_tensors="pt", truncation='only_first'
+                [line], max_length=self.max_len, pad_to_max_length=True, return_tensors="pt", truncation='longest_first'
             )
             # tokenize targets
             tokenized_targets = self.tokenizer.batch_encode_plus(
-                [target], max_length=2, pad_to_max_length=True, return_tensors="pt", truncation='only_first'
+                [target], max_length=2, pad_to_max_length=True, return_tensors="pt", truncation='longest_first'
             )
 
             self.inputs.append(tokenized_inputs)
@@ -234,29 +234,25 @@ if __name__ == '__main__':
     set_seed(42)
 
     args_dict = dict(
-        overwrite_output_dir=True,
-        do_train=True,
-        do_eval=True,
-        per_device_train_batch_size=4,
-        per_device_eval_batch_size=4,
-        gradient_accumulation_steps=20,
-        evaluation_strategy="steps",
-        eval_steps=20,
-        learning_rate=5e-05,
-        weight_decay=0.001,
-        max_grad_norm=1.0,
-        max_steps=40,
-        lr_scheduler_type="linear",
-        warmup_steps=100,
-        logging_strategy="steps",
-        logging_steps=5,
-        save_strategy="steps",
-        save_steps=50,
-        save_total_limit=1,
-        save_on_each_node=False,
-        no_cuda=False,
+        data_dir="",  # path for data files
+        output_dir="",  # path to save the checkpoints
+        model_name_or_path='Salesforce/codet5-small',
+        tokenizer_name_or_path='Salesforce/codet5-small',
+        max_seq_length=512,
+        learning_rate=3e-4,
+        weight_decay=0.0,
+        adam_epsilon=1e-8,
+        warmup_steps=0,
+        train_batch_size=8,
+        eval_batch_size=8,
+        num_train_epochs=2,
+        gradient_accumulation_steps=16,
+        n_gpu=1,
+        early_stop_callback=False,
+        fp_16=False,  # if you want to enable 16-bit training then install apex and set this to true
+        opt_level='O1',
+        max_grad_norm=1.0,  # if you enable 16-bit training then set this to a sensible value, 0.5 is a good default
         seed=42,
-        fp16=False
     )
 
     # Prepare tokenizer
