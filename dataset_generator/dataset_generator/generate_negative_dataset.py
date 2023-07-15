@@ -10,14 +10,18 @@ import json
 from gql_model import Operation
 
 
-def generate_negative_dataset(file_path: Path, dataset_pos: List[dict]):
+def generate_negative_entries_by_mixing_up(dataset_pos: List[dict], enforce_same_repo_for_pairs):
     result: List[dict] = []
 
     combs: List[Tuple[dict, dict]] = list(combinations(dataset_pos, 2))
     for pair in combs:
         operation_1 = pair[0]
         operation_2 = pair[1]
-        if operation_1 != operation_2:
+        if operation_1 != operation_2 \
+                and operation_1["name"] != operation_2["name"] \
+                and operation_1["content"] != operation_2["content"] \
+                and (not enforce_same_repo_for_pairs
+                     or operation_1["metadata"]["repo"] == operation_2["metadata"]["repo"]):
             result.append({
                 "type": operation_1["type"],
                 "name": operation_1["name"],
@@ -34,10 +38,21 @@ def generate_negative_dataset(file_path: Path, dataset_pos: List[dict]):
                 "metadata_name": operation_2["metadata"],
                 "metadata_content": operation_1["metadata"]
             })
+    return result
 
-    # result is exponentially bigger than dataset_pos. Therefore, randomly pick len(dataset_pos) entry
-    # to get dataset with same amount of negative samples as positive
-    result = random.choices(result, k=len(dataset_pos))
+
+def generate_negative_dataset(file_path: Path, dataset_pos: List[dict], percentage_difficult: float):
+    count_difficult = int(len(dataset_pos) * percentage_difficult)
+    count_simple = len(dataset_pos) - count_difficult
+
+    all_samples_simple: List[dict] = generate_negative_entries_by_mixing_up(dataset_pos, False)
+    result_simple: List[dict] = random.choices(all_samples_simple, k=count_simple)
+
+    all_samples_difficult: List[dict] = generate_negative_entries_by_mixing_up(dataset_pos, True)
+    result_difficult: List[dict] = random.choices(all_samples_difficult, k=count_difficult)
+
+    result = result_simple
+    result.extend(result_difficult)
     with open(file_path, 'w') as writer:
         json.dump(result, writer)
 
@@ -52,7 +67,7 @@ def main(suffix=None):
     with open(dataset_pos_path, 'r') as reader:
         dataset_pos = json.load(reader)
 
-    generate_negative_dataset(dataset_neg_path, dataset_pos)
+    generate_negative_dataset(dataset_neg_path, dataset_pos, percentage_difficult=0.3)
 
 
 if __name__ == '__main__':
