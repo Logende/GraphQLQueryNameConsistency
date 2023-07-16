@@ -58,6 +58,7 @@ def generate_negative_dataset(file_path: Path, dataset_pos: List[dict], percenta
 
 
 def main(suffix=None):
+    random.seed(42)
     dir_name = os.path.dirname(os.path.realpath(__file__))
     root_path = Path(dir_name).parent
     datasets_path = root_path.joinpath("collected_datasets")

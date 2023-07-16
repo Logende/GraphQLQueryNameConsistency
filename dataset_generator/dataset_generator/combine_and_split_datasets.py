@@ -18,7 +18,9 @@ def read_and_combine_datasets(files: Iterable):
 
 
 def filter_entries(entries: List[dict]) -> List[dict]:
-    return [entry for entry in entries if len(entry["name"]) > 0]
+    return [entry for entry in entries
+            if len(entry["name"]) > 0
+            ]
 
 
 def split_dataset(dataset: List, train_perc: float, val_perc: float, test_perc: float) -> Tuple[List, List, List]:

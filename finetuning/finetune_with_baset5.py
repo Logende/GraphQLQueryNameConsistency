@@ -279,7 +279,7 @@ if __name__ == '__main__':
     print(tokenizer.decode(data['target_ids']))
 
     # Continue with model
-    args_dict.update({'data_dir': 'tune', 'output_dir': 't5_graphql_consistency', 'num_train_epochs': 2})
+    args_dict.update({'data_dir': 'tune', 'output_dir': 'graphql_consistency_model', 'num_train_epochs': 2})
     args = argparse.Namespace(**args_dict)
 
     checkpoint_callback = pl.callbacks.ModelCheckpoint(
