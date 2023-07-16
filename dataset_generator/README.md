@@ -140,6 +140,24 @@ Execute
 This will randomly mix up name-query pairs of the positive dataset and put the results into a new file `collected_datasets/dataset_neg_json`.
 The length of the negative dataset will be the same as the length of the positive dataset.
 
+### Difficulty extension
+
+As the fine-tuned model reached extremely high classification accuracy, an option was added to make the negative dataset more difficult.
+Besides the method of completely randomly mixing up query name and query content, a second method for generating sampling was added.
+This method also pairs a query name (and operation type) with the content of another random query. 
+However, it, additionally, makes sure that both queries originate from the same repository. 
+Queries from the same repository often manipulate or access similar data and share a lot of context and similarity.
+
+A parameter `percentage_difficult` can be provided in the code, that decides what percentage of the generated negative dataset samples should use this new generation method.
+
+Examples of the resulting more difficult negative samples:
+
+![Negative sample with similar words in query name and in content](more_difficult_dataset_1.png)
+Negative sample with similar words in query name and in content
+
+![Negative sample with similar semantics in query name and in content](more_difficult_dataset_2.png)
+Negative sample with similar semantics in query name and in content
+
 ## Splitting into train, validation and test
 
 Finally, execute 
