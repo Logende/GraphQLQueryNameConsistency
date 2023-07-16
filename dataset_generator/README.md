@@ -166,3 +166,7 @@ Finally, execute
 This will load all generated datasets from the `collected_datasets` folder. It will differentiate between positive and negative datasets.
 The positive (or negative) datasets are then merged and then split into 80% training dataset, 10% validation dataset and 10% test dataset.
 The results are persisted under the folder `final_datasets`.
+
+## Limitations
+
+TODO: too simple

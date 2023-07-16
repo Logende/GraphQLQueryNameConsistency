@@ -19,15 +19,21 @@ As GraphQl queries are not very close to general purpose programming languages, 
 
 The fine-tuned base-t5 model was evaluated using the test dataset.
 
+## Using the initial dataset
+
 In the initially used dataset, most of the negative samples differed considerably from the positive samples, leading to very high accuracy.
 ![Classification report simple dataset](eval_simple_dataset_1.png)
 ![Confusion matrix simple dataset](eval_simple_dataset_2.png)
+
+## Using a filtered dataset
 
 After discovering that the samples still contained entries with an empty query name, I cleaned up the dataset by removing those samples with empty query names.
 I repeated the training process, as well as the evaluation (on the new test dataset) and got even higher accuracy (as before it was random and not learnable for the model whether a pair is consistent or not when the query name is empty).
 
 ![Classification report simple dataset filtered](eval_simple_dataset_filtered_1.png)
 ![Confusion matrix simple dataset_filtered](eval_simple_dataset_filtered_2.png)
+
+## Using a more difficult dataset
 
 As the accuracy was so high, I decided to introduce more difficult negative samples to make it more challenging for the model.
 Trained with the simple dataset, but tested on the more difficult dataset (30% of negative samples generated using method 2), we get the following results:
@@ -40,9 +46,36 @@ The number of false negatives does not change.
 It is surprising that the overall difference in the results is very low (179 false positive compared to 128 before) and the f-1 score still is 97%.
 This leads to the assumption that the dataset has gotten only slightly more difficult.
 
+## With the model trained on the more difficult dataset
+
 After training the model on the more difficult dataset, the evaluation results on the test dataset are as follows:
 
 ![Classification report difficult dataset](eval_difficult_dataset_1.png)
 ![Confusion matrix difficult dataset](eval_difficult_dataset_2.png)
 
 The number of false positives is lower (69 compared to 179) but the number of false negatives is higher (103 compared to  43).
+
+## Comparison between different operation types
+
+This section compares the results for the different operation types (query, mutation, subscription).
+
+Results for queries:
+![Classification report difficult dataset only queries](eval_queries_1.png)
+![Confusion matrix difficult dataset only queries](eval_queries_2.png)
+
+Results for mutations:
+![Classification report difficult dataset only mutations](eval_mutations_1.png)
+![Confusion matrix difficult dataset only mutations](eval_mutations_2.png)
+
+Results for subscriptions:
+![Classification report difficult dataset only subscriptions](eval_subscriptions_1.png)
+![Confusion matrix difficult dataset only subscriptions](eval_subscriptions_2.png)
+
+The results for mutations and subscriptions are slightly better than the results for queries.
+
+
+## Limitations
+
+The data used during the process does not include the operation type. This might have been valuable information for the model.
+
+TODO: dataset too simple?

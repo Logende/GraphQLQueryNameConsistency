@@ -20,6 +20,7 @@ def read_and_combine_datasets(files: Iterable):
 def filter_entries(entries: List[dict]) -> List[dict]:
     return [entry for entry in entries
             if len(entry["name"]) > 0
+            and entry["type"] == "subscription"
             ]
 
 
@@ -44,7 +45,7 @@ def main():
     dir_name = os.path.dirname(os.path.realpath(__file__))
     root_path = Path(dir_name).parent
     datasets_path = root_path.joinpath("collected_datasets")
-    final_datasets_path = root_path.joinpath("final_datasets")
+    final_datasets_path = root_path.joinpath("final_datasets_difficult_subscriptions")
 
     datasets_pos_path = datasets_path.rglob("dataset_pos*")
     datasets_neg_path = datasets_path.rglob("dataset_neg*")
