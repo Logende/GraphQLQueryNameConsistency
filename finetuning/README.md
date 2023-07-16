@@ -30,5 +30,19 @@ I repeated the training process, as well as the evaluation (on the new test data
 ![Confusion matrix simple dataset_filtered](eval_simple_dataset_filtered_2.png)
 
 As the accuracy was so high, I decided to introduce more difficult negative samples to make it more challenging for the model.
-Trained with the simple dataset, but tested on the more difficult dataset, we get the following results:
+Trained with the simple dataset, but tested on the more difficult dataset (30% of negative samples generated using method 2), we get the following results:
 
+![Classification report difficult dataset simple model](eval_difficult_dataset_simple_model_1.png)
+![Confusion matrix difficult simple model](eval_difficult_dataset_simple_model_2.png)
+
+The results are as expected with the change: more inconsistent samples are now falsely detected as consistent by the model.
+The number of false negatives does not change.
+It is surprising that the overall difference in the results is very low (179 false positive compared to 128 before) and the f-1 score still is 97%.
+This leads to the assumption that the dataset has gotten only slightly more difficult.
+
+After training the model on the more difficult dataset, the evaluation results on the test dataset are as follows:
+
+![Classification report difficult dataset](eval_difficult_dataset_1.png)
+![Confusion matrix difficult dataset](eval_difficult_dataset_2.png)
+
+The number of false positives is lower (69 compared to 179) but the number of false negatives is higher (103 compared to  43).
