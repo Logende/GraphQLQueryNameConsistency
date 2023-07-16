@@ -12,7 +12,13 @@ def read_and_combine_datasets(files: Iterable):
         with open(file, 'r') as reader:
             data = json.load(reader)
             result.extend(data)
-    return result
+    result_filtered = filter_entries(result)
+    print("Filter removed " + str(len(result) - len(result_filtered)) + " entries from dataset.")
+    return result_filtered
+
+
+def filter_entries(entries: List[dict]) -> List[dict]:
+    return [entry for entry in entries if len(entry["name"]) > 0]
 
 
 def split_dataset(dataset: List, train_perc: float, val_perc: float, test_perc: float) -> Tuple[List, List, List]:

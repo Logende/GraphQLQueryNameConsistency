@@ -30,7 +30,9 @@ def load_extracted_data(file_path: Path) -> List[Operation | Fragment]:
 
 def persist_dataset(file_path: Path, data: List[Operation | Fragment]):
     operations = [operation.to_dict() for operation in data
-                  if isinstance(operation, Operation) and operation.operation_name is not None]
+                  if isinstance(operation, Operation)
+                  and operation.operation_name is not None
+                  and len(operation.operation_name) > 0]
     # Currently, we only care about operations for dataset
     with open(file_path, 'w') as writer:
         json.dump(operations, writer)
