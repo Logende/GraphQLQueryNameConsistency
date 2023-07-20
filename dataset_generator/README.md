@@ -88,7 +88,6 @@ The rest of the operation will be stored as operation content.
 
 Extracted fragments and operations will be persisted in a YAML file inside the `colleced_queries` folder, one file for each repository.
 
-Pda
 Example of this issue:
 
 ````
