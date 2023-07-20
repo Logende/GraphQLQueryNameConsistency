@@ -33,7 +33,6 @@ def post_process_entry(entry: dict) -> dict:
     if argument_start_index >= 0:
         actual_operation_name = operation_name[:argument_start_index]
         arguments = operation_name[argument_start_index:]
-        print("Found operation name " + actual_operation_name + " and arguments " + arguments)
         result["name"] = actual_operation_name.strip()
         result["arguments"] = arguments.strip()
     return result
