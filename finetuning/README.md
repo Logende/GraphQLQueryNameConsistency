@@ -89,7 +89,7 @@ Results of the model trained on the more difficult dataset and tested on the dat
 Results of the model trained and tested on the dataset without arguments:
 
 ![Classification report difficult dataset without arguments and difficult model](eval_difficult_no_args_dataset_difficult_model_no_args_1.png)
-![Confusion matrix difficult dataset without arguments and difficult model](eval_difficult_no_args_dataset_difficult_model_no_args2.png)
+![Confusion matrix difficult dataset without arguments and difficult model](eval_difficult_no_args_dataset_difficult_model_no_args_2.png)
 
 
 
