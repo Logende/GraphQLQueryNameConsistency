@@ -10,6 +10,7 @@ import json
 def read_dataset(file: Path):
     with open(file, 'r') as reader:
         result = json.load(reader)
+    print("Dataset has " + str(len(result)) + " entries")
     result_filtered = filter_entries(result)
     print("Filter removed " + str(len(result) - len(result_filtered)) + " entries from dataset.")
     return result_filtered
@@ -18,7 +19,7 @@ def read_dataset(file: Path):
 def filter_entries(entries: List[dict]) -> List[dict]:
     return [entry for entry in entries
             if len(entry["name"]) > 0
-            and entry["type"] == "subscription"
+            #and entry["type"] == "subscription"
             ]
 
 
@@ -31,7 +32,10 @@ def compute_average_content_length(entries: List[dict]):
 def main():
     dir_name = os.path.dirname(os.path.realpath(__file__))
     root_path = Path(dir_name).parent
-    final_datasets_path = root_path.joinpath("final_datasets_difficult")
+    final_datasets_path = root_path.joinpath("final_datasets_difficult_subscriptions")
+
+    if not final_datasets_path.exists():
+        raise FileNotFoundError("Dataset folder " + str(final_datasets_path) + " does not exist.")
 
     combined_pos_path = final_datasets_path.joinpath("dataset_pos.json")
     combined_neg_path = final_datasets_path.joinpath("dataset_neg.json")

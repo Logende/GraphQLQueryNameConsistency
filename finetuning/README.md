@@ -72,7 +72,7 @@ Results for subscriptions:
 ![Confusion matrix difficult dataset only subscriptions](eval_subscriptions_2.png)
 
 The results for mutations and subscriptions are slightly better than the results for queries.
-
+^
 
 ## Limitations
 

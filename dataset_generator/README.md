@@ -35,8 +35,8 @@ Dependent repositories are shown by Github [here](https://github.com/apollograph
 
 Use the [github-dependents-info](https://github.com/nvuillam/github-dependents-info) code to generate a list of the dependents.
 
-Problem: Apollo Client has more than 160.000 dependent repositories. 
-Scraping the website for all dependents would require accessing more than 5300 Github pages programmatically (as each page lists 30 dependent repositories).
+Problem: Apollo Client has more than 195.000 dependent repositories. 
+Scraping the website for all dependents would require accessing more than 6500 Github pages programmatically (as each page lists 30 dependent repositories).
 After around 25 page accesses, we experienced a timeout that takes many seconds, until scraping can continue.
 As for the project we stick to 1000 repositories for dataset generation, the repo scraper was modified to stop once it collected 1000 repos.
 Additionally, the scraper was modified to collect the repositories of the `@apollo-client` and `apollo-client` only and ignore the other packages (`apollo-boost`, `apollo-cache`, ...).
@@ -88,9 +88,7 @@ The rest of the operation will be stored as operation content.
 
 Extracted fragments and operations will be persisted in a YAML file inside the `colleced_queries` folder, one file for each repository.
 
-Problem: somehow, a few of the files lead to the regular expression matching to take more than five hours (maybe forever?).
-Solution: instead of the re library, use regex, which supports timeouts. Then set timeouts for the pattern matching.
-
+Pda
 Example of this issue:
 
 ````

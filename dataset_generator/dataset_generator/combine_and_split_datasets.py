@@ -12,15 +12,37 @@ def read_and_combine_datasets(files: Iterable):
         with open(file, 'r') as reader:
             data = json.load(reader)
             result.extend(data)
-    result_filtered = filter_entries(result)
+    result_filtered = filter_entries(post_process_entries(result))
     print("Filter removed " + str(len(result) - len(result_filtered)) + " entries from dataset.")
     return result_filtered
+
+
+def post_process_entries(entries: List[dict]) -> List[dict]:
+    result = []
+
+    for entry in entries:
+        result.append(post_process_entry(entry))
+    return result
+
+
+def post_process_entry(entry: dict) -> dict:
+    result = entry.copy()
+
+    operation_name: str = entry["name"]
+    argument_start_index = operation_name.find('(')
+    if argument_start_index >= 0:
+        actual_operation_name = operation_name[:argument_start_index]
+        arguments = operation_name[argument_start_index:]
+        print("Found operation name " + actual_operation_name + " and arguments " + arguments)
+        result["name"] = actual_operation_name.strip()
+        result["arguments"] = arguments.strip()
+    return result
 
 
 def filter_entries(entries: List[dict]) -> List[dict]:
     return [entry for entry in entries
             if len(entry["name"]) > 0
-            and entry["type"] == "subscription"
+            # and entry["type"] == "query"
             ]
 
 
@@ -45,7 +67,7 @@ def main():
     dir_name = os.path.dirname(os.path.realpath(__file__))
     root_path = Path(dir_name).parent
     datasets_path = root_path.joinpath("collected_datasets")
-    final_datasets_path = root_path.joinpath("final_datasets_difficult_subscriptions")
+    final_datasets_path = root_path.joinpath("final_datasets_difficult_no_args")
 
     datasets_pos_path = datasets_path.rglob("dataset_pos*")
     datasets_neg_path = datasets_path.rglob("dataset_neg*")
