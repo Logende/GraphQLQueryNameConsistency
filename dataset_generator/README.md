@@ -166,4 +166,4 @@ The results are persisted under the folder `final_datasets`.
 
 ## Limitations
 
-TODO: too simple
+The negative samples were artificially created and do not necessarily represent the reality. 
