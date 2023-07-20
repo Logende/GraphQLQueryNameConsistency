@@ -32,7 +32,7 @@ def compute_average_content_length(entries: List[dict]):
 def main():
     dir_name = os.path.dirname(os.path.realpath(__file__))
     root_path = Path(dir_name).parent
-    final_datasets_path = root_path.joinpath("final_datasets_difficult_subscriptions")
+    final_datasets_path = root_path.joinpath("final_datasets_difficult_no_args")
 
     if not final_datasets_path.exists():
         raise FileNotFoundError("Dataset folder " + str(final_datasets_path) + " does not exist.")

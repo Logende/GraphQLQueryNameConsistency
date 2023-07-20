@@ -72,10 +72,27 @@ Results for subscriptions:
 ![Confusion matrix difficult dataset only subscriptions](eval_subscriptions_2.png)
 
 The results for mutations and subscriptions are slightly better than the results for queries.
-^
+
+
+## Removing arguments from the operation name
+
+In the previous training and evaluation attempts, the operation names in the dataset always included the operation arguments.
+This could be the reason for the high accuracy: the identical arguments are always repeated in the operation content if the sample is consistent.
+
+Therefore, I decided to test whether removing the arguments from the operation name would reduce the accuracy of the model.
+
+Results of the model trained on the more difficult dataset and tested on the dataset where operation names do not include arguments:
+
+![Classification report difficult dataset without arguments and difficult model](eval_difficult_no_args_dataset_difficult_model_1.png)
+![Confusion matrix difficult dataset without arguments and difficult model](eval_difficult_no_args_dataset_difficult_model_2.png)
+
+Results of the model trained and tested on the dataset without arguments:
+
+![Classification report difficult dataset without arguments and difficult model](eval_difficult_no_args_dataset_difficult_model_no_args_1.png)
+![Confusion matrix difficult dataset without arguments and difficult model](eval_difficult_no_args_dataset_difficult_model_no_args2.png)
+
+
 
 ## Limitations
 
-The data used during the process does not include the operation type. This might have been valuable information for the model.
-
-TODO: dataset too simple?
+The data used during the training and evaluation process does not include the operation type. This might have been valuable information for the model.

@@ -15,3 +15,5 @@ This inconsistent dataset has been split into train, validation and test too.
 
 Different attempts on fine-tuning have been made (see `finetuning` folder). 
 The most successful attempt was fine-tuning base-T5 using the custom dataset.
+
+Evaluation of the models is also contained in that folder.
